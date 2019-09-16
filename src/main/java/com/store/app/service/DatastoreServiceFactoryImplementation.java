@@ -9,7 +9,7 @@ public class DatastoreServiceFactoryImplementation implements DatastoreServiceFa
 
     private DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
-    public DatastoreService getDatastoreService(){
+    public DatastoreService getDatastoreService() {
         return datastoreService;
     }
 

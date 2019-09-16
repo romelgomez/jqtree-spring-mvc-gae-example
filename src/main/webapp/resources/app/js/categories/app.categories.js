@@ -1,7 +1,7 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
 
-    (function( categories, $, undefined ) {
+    (function (categories, $, undefined) {
 
         /*
          @Name              -> treeElement
@@ -30,7 +30,7 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> getTree()
          */
-        var displayJqTreeData = function(treeData){
+        var displayJqTreeData = function (treeData) {
             var options = {
                 dragAndDrop: true,
                 selectable: true,
@@ -51,7 +51,7 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> newCategory(), editCategoryName()
          */
-        var replaceWholeTree = function(treeData){
+        var replaceWholeTree = function (treeData) {
             treeElement.tree('loadData', treeData);
         };
 
@@ -65,15 +65,15 @@ $(document).ready(function() {
          @returns           -> JSON Object: JqTree Node
          @implemented by    -> sourceDataAsJqTreeData();
          */
-        var packAsJqTreeNode = function(sourceNode){
+        var packAsJqTreeNode = function (sourceNode) {
             var node = {};
 
-            node['id']         = sourceNode['id'];
-            node['label']      = sourceNode['properties']['name'];
-            node['parent_id']  = sourceNode['properties']['parent_id'];
-            node['left']       = sourceNode['properties']['left'];
-            node['right']      = sourceNode['properties']['right'];
-            node['children']   = [];
+            node['id'] = sourceNode['id'];
+            node['label'] = sourceNode['properties']['name'];
+            node['parent_id'] = sourceNode['properties']['parent_id'];
+            node['left'] = sourceNode['properties']['left'];
+            node['right'] = sourceNode['properties']['right'];
+            node['children'] = [];
 
             return node;
         };
@@ -87,18 +87,18 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> sourceDataAsJqTreeData();
          */
-        var insertChildNode = function(targetTree,childNode){
+        var insertChildNode = function (targetTree, childNode) {
 
             /* (ES) Para el objeto actual, si se detecta que es un objeto dependiente, se mapea recursivamente target_tree, donde si id del objeto dependiente es igual al
             el objeto para el momento en el bucle recursivo, quiere decir que tal objeto dependiente es hijo del objeto actual.
             */
 
-            $(targetTree).each(function(index,node){
-                if(node['id'] == childNode['parent_id']){
+            $(targetTree).each(function (index, node) {
+                if (node['id'] == childNode['parent_id']) {
                     node['children'].push(childNode);
-                }else{
-                    if(node['children'].length > 0){
-                        insertChildNode(node['children'],childNode);
+                } else {
+                    if (node['children'].length > 0) {
+                        insertChildNode(node['children'], childNode);
                     }
                 }
             });
@@ -115,18 +115,18 @@ $(document).ready(function() {
          @returns           -> Array
          @implemented by    -> getTree(), newCategory(), editCategoryName();
          */
-        var sourceDataAsJqTreeData = function(sourceData){
+        var sourceDataAsJqTreeData = function (sourceData) {
             var targetTree = [];
 
-            $(sourceData).each(function(){
+            $(sourceData).each(function () {
                 //  jqTree Node
-                var node  = packAsJqTreeNode(this);
+                var node = packAsJqTreeNode(this);
 
-                if(node['parent_id'] != ''){
+                if (node['parent_id'] != '') {
                     // Is child node
                     // Recursive Function
-                    insertChildNode(targetTree,node);
-                }else{
+                    insertChildNode(targetTree, node);
+                } else {
                     // Is root node
                     // Se inserta el nodo directamente
                     targetTree.push(node);
@@ -146,8 +146,8 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> getTree();
          */
-        var logSourceData = function(treeData){
-            var jsonTree = "<pre class=\"prettyprint\" >"+JSON.stringify(treeData,null,'\t')+"</pre>";
+        var logSourceData = function (treeData) {
+            var jsonTree = "<pre class=\"prettyprint\" >" + JSON.stringify(treeData, null, '\t') + "</pre>";
             $("#source-data").html(jsonTree);
         };
 
@@ -160,8 +160,8 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> getTree();
          */
-        var logSourceDataAsJqTreeData = function(treeData){
-            var jsonTree = "<pre class=\"prettyprint\" >"+JSON.stringify(treeData,null,'\t')+"</pre>";
+        var logSourceDataAsJqTreeData = function (treeData) {
+            var jsonTree = "<pre class=\"prettyprint\" >" + JSON.stringify(treeData, null, '\t') + "</pre>";
             $("#source-data-as-jqtree-data").html(jsonTree);
         };
 
@@ -174,28 +174,28 @@ $(document).ready(function() {
          @returns           -> Array of Objects
          @implemented by    -> deleteCategory(), treeMove();
          */
-        var prepare_for_data_store = function(tree){
+        var prepare_for_data_store = function (tree) {
 
             var result = [];
 
-            var process = function(tree){
+            var process = function (tree) {
 
-                $(tree).each(function(index,node){
+                $(tree).each(function (index, node) {
 
                     var data = {};
 
-                    data['id']         = node['id'];
+                    data['id'] = node['id'];
 
                     data['properties'] = {};
 
-                    data['properties']['name']      = node['name'];
+                    data['properties']['name'] = node['name'];
                     data['properties']['parent_id'] = node['parent_id'];
-                    data['properties']['left']      = node['left'];
-                    data['properties']['right']     = node['right'];
+                    data['properties']['left'] = node['left'];
+                    data['properties']['right'] = node['right'];
 
                     result.push(data);
 
-                    if(node['children'].length > 0){
+                    if (node['children'].length > 0) {
                         process(node['children']);
                     }
 
@@ -218,7 +218,7 @@ $(document).ready(function() {
          @returns           -> Null
          @implemented by    -> deleteCategory(), treeMove();
          */
-        var normalize = function(tree){
+        var normalize = function (tree) {
 
             /* (ES) es una función recursiva que recibe el árbol modificado por el usuario, al mover una categoría o nodo a otro lugar arrastrando y
             soltando (Drag and drop), se producen inconsistencia en los valores left y right, fix() se encarga de reescribir los valores left y right en el nuevo
@@ -230,28 +230,28 @@ $(document).ready(function() {
 
             var fix_count;
 
-            var process = function(tree,parent_id){
-                $(tree).each(function(index,node){
+            var process = function (tree, parent_id) {
+                $(tree).each(function (index, node) {
 
-                    if(!fix_count){
+                    if (!fix_count) {
                         fix_count = 1;
                     }
 
-                    node.left = fix_count; fix_count +=1;
+                    node.left = fix_count; fix_count += 1;
 
-                    if(parent_id){
+                    if (parent_id) {
                         node.parent_id = parent_id;
-                    }else{
+                    } else {
                         node.parent_id = '';
                     }
 
-                    if(node['children'] !== undefined && node['children'].length >= 1){
+                    if (node['children'] !== undefined && node['children'].length >= 1) {
                         // hay nodos dependientes
-                        process(node.children,node.id);
-                    }else{
+                        process(node.children, node.id);
+                    } else {
                         node.children = [];
                     }
-                    node.right = fix_count; fix_count +=1;
+                    node.right = fix_count; fix_count += 1;
 
                 });
             };
@@ -269,26 +269,26 @@ $(document).ready(function() {
          @returns           -> JSON; .target_tree: tree with node's excluded; .records_ids_for_delete: id of records for delete;
          @implemented by    -> deleteCategory()
          */
-        var excludeNode = function(tree,deleteCategoryId,deleteCategoryBranch){
+        var excludeNode = function (tree, deleteCategoryId, deleteCategoryBranch) {
 
             var result = {
                 'target_tree': [],
-                'records_ids_for_delete':[]
+                'records_ids_for_delete': []
             };
 
-            var getRecordsIdsForDelete = function(deleteNode){
+            var getRecordsIdsForDelete = function (deleteNode) {
 
                 var result = [];
 
                 result.push(deleteNode.id);
 
-                var process = function(node){
+                var process = function (node) {
 
-                    $(node).each(function(index,current_node){
+                    $(node).each(function (index, current_node) {
 
                         result.push(current_node.id);
 
-                        if(node['children'] !== undefined){
+                        if (node['children'] !== undefined) {
                             process(current_node.children);
                         }
 
@@ -302,59 +302,59 @@ $(document).ready(function() {
 
             };
 
-            var process = function(tree){
-                $(tree).each(function(index,node){
+            var process = function (tree) {
+                $(tree).each(function (index, node) {
 
-                    if(node['id'] == deleteCategoryId){
+                    if (node['id'] == deleteCategoryId) {
 
-                        if(node['children'] !== undefined){
-                            if(deleteCategoryBranch == true){
+                        if (node['children'] !== undefined) {
+                            if (deleteCategoryBranch == true) {
                                 // delete node and children
-                               result.records_ids_for_delete = getRecordsIdsForDelete(node);
-                            }else{
+                                result.records_ids_for_delete = getRecordsIdsForDelete(node);
+                            } else {
                                 // Keep children
                                 result.records_ids_for_delete.push(node['id']);
 
-                                if(node.parent_id == ''){
-                                    for(var i = 0; i < node.children.length; i++){
+                                if (node.parent_id == '') {
+                                    for (var i = 0; i < node.children.length; i++) {
                                         node.children[i].parent_id = '';
                                     }
-                                }else{
-                                    for(var e = 0; e < node.children.length; e++){
+                                } else {
+                                    for (var e = 0; e < node.children.length; e++) {
                                         node.children[e].parent_id = node.parent_id;
                                     }
                                 }
 
                                 process(node.children);
                             }
-                        }else{
+                        } else {
                             result.records_ids_for_delete.push(node['id']);
                         }
 
-                    }else{
+                    } else {
 
                         var new_node = {
-                            id:             node['id'],
-                            parent_id:      node['parent_id'],
-                            name:           node['name'],
-                            left:           node['left'],
-                            right:          node['right'],
-                            children:       []
+                            id: node['id'],
+                            parent_id: node['parent_id'],
+                            name: node['name'],
+                            left: node['left'],
+                            right: node['right'],
+                            children: []
                         };
 
-                        if(node.parent_id != ""){
+                        if (node.parent_id != "") {
                             // Is child node
                             // Función recursiva
-                            insertChildNode(result['target_tree'],new_node);
-                        }else{
+                            insertChildNode(result['target_tree'], new_node);
+                        } else {
                             // Is root node
                             // Se inserta el nodo directamente
                             result['target_tree'].push(new_node);
                         }
 
-//                        result['target_tree'].push(new_node);
+                        //                        result['target_tree'].push(new_node);
 
-                        if(node['children'] !== undefined){
+                        if (node['children'] !== undefined) {
                             process(node.children);
                         }
 
@@ -377,12 +377,12 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
          */
-        var deleteCategory = function(){
-            $("#delete-category").on('click',function(event){
+        var deleteCategory = function () {
+            $("#delete-category").on('click', function (event) {
                 event.preventDefault();
-                if(!$(this).hasClass("disabled")){
+                if (!$(this).hasClass("disabled")) {
                     // Activamos el modal
-                    $('#delete-category-modal').modal({"backdrop":false,"keyboard":true,"show":true,"remote":false}).on('hide.bs.modal',function(){
+                    $('#delete-category-modal').modal({ "backdrop": false, "keyboard": true, "show": true, "remote": false }).on('hide.bs.modal', function () {
                         validate.removeValidationStates('category-delete-form');
                     });
                 }
@@ -391,26 +391,26 @@ $(document).ready(function() {
             var notification;
 
             var request_parameters = {
-                "requestType":"custom",
-                "type":"post",
-                "url":"/delete-category",
-                "data":{},
-                "callbacks":{
-                    "beforeSend":function(){
+                "requestType": "custom",
+                "type": "post",
+                "url": "/delete-category",
+                "data": {},
+                "callbacks": {
+                    "beforeSend": function () {
                         notification = ajax.notification("beforeSend");
                     },
-                    "success":function(response){
+                    "success": function (response) {
 
-                        if(response['status']){
-                            ajax.notification("success",notification);
-                        }else{
-                            ajax.notification("error",notification);
+                        if (response['status']) {
+                            ajax.notification("success", notification);
+                        } else {
+                            ajax.notification("error", notification);
                         }
 
                         $('#delete-category-modal').modal('hide');
                         validate.removeValidationStates('category-delete-form');
 
-                        if(response['tree'].length > 0){
+                        if (response['tree'].length > 0) {
                             // log
                             var jqTreeData = sourceDataAsJqTreeData(response.tree);
                             logSourceData(response);
@@ -423,41 +423,41 @@ $(document).ready(function() {
 
                             var treeData = sourceDataAsJqTreeData(response['tree']);
                             replaceWholeTree(treeData)
-                        }else{
+                        } else {
                             $('#no-tree').show();
                             $('#tree').hide();
                             $('#log').hide();
                         }
 
                         var adminCategory = $("#admin-category");
-                        adminCategory.find("button").each(function(k,element){
+                        adminCategory.find("button").each(function (k, element) {
                             $(element).addClass("disabled");
                         });
 
                     },
-                    "error":function(){
-                        ajax.notification("error",notification);
+                    "error": function () {
+                        ajax.notification("error", notification);
                     },
-                    "complete":function(response){}
+                    "complete": function (response) { }
                 }
             };
 
             // validación:
             var validateObj = {
-                "submitHandler": function(){
+                "submitHandler": function () {
 
-                    var deleteCategoryId        = $("#delete-category-id").val();
-                    var deleteCategoryBranch    = $("#delete-category-branch").prop('checked');
-                    var tree                    = JSON.parse(treeElement.tree('toJson'));
+                    var deleteCategoryId = $("#delete-category-id").val();
+                    var deleteCategoryBranch = $("#delete-category-branch").prop('checked');
+                    var tree = JSON.parse(treeElement.tree('toJson'));
 
-                    var excludeResult           = excludeNode(tree,deleteCategoryId,deleteCategoryBranch);
+                    var excludeResult = excludeNode(tree, deleteCategoryId, deleteCategoryBranch);
 
                     normalize(excludeResult['target_tree']);
                     var new_tree = prepare_for_data_store(excludeResult['target_tree']);
 
                     request_parameters.data = {
-                        'tree':new_tree,
-                        'records_ids_for_delete':excludeResult['records_ids_for_delete']
+                        'tree': new_tree,
+                        'records_ids_for_delete': excludeResult['records_ids_for_delete']
                     };
 
                     ajax.request(request_parameters);
@@ -465,7 +465,7 @@ $(document).ready(function() {
                 }
             };
 
-            validate.form("category-delete-form",validateObj);
+            validate.form("category-delete-form", validateObj);
 
         };
 
@@ -478,12 +478,12 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
          */
-        var editCategoryName = function(){
-            $("#edit-category").on('click',function(event){
+        var editCategoryName = function () {
+            $("#edit-category").on('click', function (event) {
                 event.preventDefault();
-                if(!$(this).hasClass("disabled")){
+                if (!$(this).hasClass("disabled")) {
                     // Activamos el modal
-                    $('#edit-category-modal').modal({"backdrop":false,"keyboard":true,"show":true,"remote":false}).on('hide.bs.modal',function(){
+                    $('#edit-category-modal').modal({ "backdrop": false, "keyboard": true, "show": true, "remote": false }).on('hide.bs.modal', function () {
                     });
                 }
             });
@@ -491,42 +491,42 @@ $(document).ready(function() {
             var notification;
 
             var request_parameters = {
-                "requestType":"form",
-                "type":"post",
-                "url":"/edit-category",
-                "data":{},
-                "form":{
-                    "id":"category-edit-form",
-                    "inputs":[
-                        {'id':'edit-category-id', 'name':'id'},
-                        {'id':'edit-category-name', 'name':'name'}
+                "requestType": "form",
+                "type": "post",
+                "url": "/edit-category",
+                "data": {},
+                "form": {
+                    "id": "category-edit-form",
+                    "inputs": [
+                        { 'id': 'edit-category-id', 'name': 'id' },
+                        { 'id': 'edit-category-name', 'name': 'name' }
                     ]
                 },
-                "callbacks":{
-                    "beforeSend":function(){
+                "callbacks": {
+                    "beforeSend": function () {
                         notification = ajax.notification("beforeSend");
                     },
-                    "success":function(response){
+                    "success": function (response) {
 
                         var form = $("#category-edit-form");
 
-                        if(response['status']){
-                            ajax.notification("success",notification);
+                        if (response['status']) {
+                            ajax.notification("success", notification);
 
                             form.find(".alert-success").fadeIn();
 
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $("#category-edit-form").find(".alert-success").fadeOut();
-                            },2000);
+                            }, 2000);
 
-                        }else{
-                            ajax.notification("error",notification);
+                        } else {
+                            ajax.notification("error", notification);
 
                             form.find(".alert-danger").fadeIn();
                             form.find(".modal-body").find(".form-group").hide();
                             form.find(".modal-footer").hide();
 
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $('#edit-category-modal').modal('hide');
                                 validate.removeValidationStates('category-edit-form');
 
@@ -536,10 +536,10 @@ $(document).ready(function() {
                                 form.find(".modal-body").find(".form-group").show();
                                 form.find(".modal-footer").show();
 
-                            },3000);
+                            }, 3000);
                         }
 
-                        if(response['tree'].length > 0){
+                        if (response['tree'].length > 0) {
                             // log
                             var jqTreeData = sourceDataAsJqTreeData(response.tree);
                             logSourceData(response);
@@ -552,44 +552,44 @@ $(document).ready(function() {
 
                             var treeData = sourceDataAsJqTreeData(response['tree']);
                             replaceWholeTree(treeData)
-                        }else{
+                        } else {
                             $('#no-tree').show();
                             $('#tree').hide();
                         }
 
                         var adminCategory = $("#admin-category");
-                        adminCategory.find("button").each(function(k,element){
+                        adminCategory.find("button").each(function (k, element) {
                             $(element).addClass("disabled");
                         });
 
                     },
-                    "error":function(){
-                        ajax.notification("error",notification);
+                    "error": function () {
+                        ajax.notification("error", notification);
                     },
-                    "complete":function(response){}
+                    "complete": function (response) { }
                 }
             };
 
             // validación:
             var validateObj = {
-                "submitHandler": function(){
+                "submitHandler": function () {
                     ajax.request(request_parameters);
                 },
-                "rules":{
-                    "edit-category-name":{
-                        "required":true,
-                        "maxlength":20
+                "rules": {
+                    "edit-category-name": {
+                        "required": true,
+                        "maxlength": 20
                     }
                 },
-                "messages":{
-                    "edit-category-name":{
-                        "required":"El campo nombre es obligatorio.",
-                        "maxlength":"El nombre de la categoría no debe tener mas de 20 caracteres."
+                "messages": {
+                    "edit-category-name": {
+                        "required": "El campo nombre es obligatorio.",
+                        "maxlength": "El nombre de la categoría no debe tener mas de 20 caracteres."
                     }
                 }
             };
 
-            validate.form("category-edit-form",validateObj);
+            validate.form("category-edit-form", validateObj);
 
         };
 
@@ -602,28 +602,28 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
          */
-        var treeMove = function(){
+        var treeMove = function () {
 
             var notification;
 
             var request_parameters = {
-                "requestType":"custom",
-                "type":"post",
-                "url":"/update-tree",
-                "data":{},
-                "callbacks":{
-                    "beforeSend":function(){
+                "requestType": "custom",
+                "type": "post",
+                "url": "/update-tree",
+                "data": {},
+                "callbacks": {
+                    "beforeSend": function () {
                         notification = ajax.notification("beforeSend");
                     },
-                    "success":function(response){
+                    "success": function (response) {
 
-                        if(response['status']){
-                            ajax.notification("success",notification);
-                        }else{
-                            ajax.notification("error",notification);
+                        if (response['status']) {
+                            ajax.notification("success", notification);
+                        } else {
+                            ajax.notification("error", notification);
                         }
 
-                        if(response['tree'].length > 0){
+                        if (response['tree'].length > 0) {
                             // log
                             var jqTreeData = sourceDataAsJqTreeData(response.tree);
                             logSourceData(response);
@@ -636,23 +636,23 @@ $(document).ready(function() {
 
                             var treeData = sourceDataAsJqTreeData(response['tree']);
                             replaceWholeTree(treeData)
-                        }else{
+                        } else {
                             $('#no-tree').show();
                             $('#tree').hide();
                         }
 
                     },
-                    "error":function(){
-                        ajax.notification("error",notification);
+                    "error": function () {
+                        ajax.notification("error", notification);
                     },
-                    "complete":function(response){}
+                    "complete": function (response) { }
                 }
             };
 
-            treeElement.bind('tree.move',function(event) {
+            treeElement.bind('tree.move', function (event) {
 
                 var adminCategory = $("#admin-category");
-                adminCategory.find("button").each(function(k,element){
+                adminCategory.find("button").each(function (k, element) {
                     $(element).addClass("disabled");
                 });
 
@@ -666,7 +666,7 @@ $(document).ready(function() {
                 var new_tree = prepare_for_data_store(tree);
 
                 request_parameters['data'] = {
-                    'tree':new_tree
+                    'tree': new_tree
                 };
 
                 ajax.request(request_parameters);
@@ -684,10 +684,10 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
          */
-        var newCategory = function(){
-            $(".new-category").on('click',function(event){
+        var newCategory = function () {
+            $(".new-category").on('click', function (event) {
                 event.preventDefault();
-                $('#new-category-modal').modal({"backdrop":false,"keyboard":true,"show":true,"remote":false}).on('hide.bs.modal',function(){
+                $('#new-category-modal').modal({ "backdrop": false, "keyboard": true, "show": true, "remote": false }).on('hide.bs.modal', function () {
                     validate.removeValidationStates('category-add-form');
                 });
             });
@@ -695,42 +695,42 @@ $(document).ready(function() {
             var notification;
 
             var request_parameters = {
-                "requestType":"form",
-                "type":"post",
-                "url":"/new-category",
-                "data":{},
-                "form":{
-                    "id":"category-add-form",
-                    "inputs":[
-                        {'id':'category-name', 'name':'name'}
+                "requestType": "form",
+                "type": "post",
+                "url": "/new-category",
+                "data": {},
+                "form": {
+                    "id": "category-add-form",
+                    "inputs": [
+                        { 'id': 'category-name', 'name': 'name' }
                     ]
                 },
-                "callbacks":{
-                    "beforeSend":function(){
+                "callbacks": {
+                    "beforeSend": function () {
                         notification = ajax.notification("beforeSend");
                     },
-                    "success":function(response){
+                    "success": function (response) {
 
                         var form = $("#category-add-form");
 
-                        if(response['status']){
-                            ajax.notification("success",notification);
+                        if (response['status']) {
+                            ajax.notification("success", notification);
 
                             form.find(".alert-success").fadeIn();
                             validate.removeValidationStates('category-add-form');
 
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $("#category-add-form").find(".alert-success").fadeOut();
-                            },2000);
+                            }, 2000);
 
-                        }else{
-                            ajax.notification("error",notification);
+                        } else {
+                            ajax.notification("error", notification);
 
                             form.find(".alert-danger").fadeIn();
                             form.find(".modal-body").find(".form-group").hide();
                             form.find(".modal-footer").hide();
 
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $('#new-category-modal').modal('hide');
                                 validate.removeValidationStates('category-add-form');
 
@@ -739,10 +739,10 @@ $(document).ready(function() {
                                 form.find(".modal-body").find(".form-group").show();
                                 form.find(".modal-footer").show();
 
-                            },3000);
+                            }, 3000);
                         }
 
-                        if(response['tree'].length > 0){
+                        if (response['tree'].length > 0) {
 
                             var jqTreeData = sourceDataAsJqTreeData(response.tree);
 
@@ -755,47 +755,47 @@ $(document).ready(function() {
                             $('#tree').show();
                             $('#log').show();
 
-                            if(initEstate == 0){
+                            if (initEstate == 0) {
                                 displayJqTreeData(jqTreeData);
                                 initEstate = 1;
-                            }else{
+                            } else {
                                 replaceWholeTree(jqTreeData);
                             }
 
 
-                        }else{
+                        } else {
                             $('#no-tree').show();
                             $('#tree').hide();
                         }
 
                     },
-                    "error":function(){
-                        ajax.notification("error",notification);
+                    "error": function () {
+                        ajax.notification("error", notification);
                     },
-                    "complete":function(response){}
+                    "complete": function (response) { }
                 }
             };
 
             // validación:
             var validateObj = {
-                "submitHandler": function(){
+                "submitHandler": function () {
                     ajax.request(request_parameters);
                 },
-                "rules":{
-                    "category-name":{
-                        "required":true,
-                        "maxlength":50
+                "rules": {
+                    "category-name": {
+                        "required": true,
+                        "maxlength": 50
                     }
                 },
-                "messages":{
-                    "category-name":{
-                        "required":"El campo nombre es obligatorio.",
-                        "maxlength":"El nombre de la categoría no debe tener mas de 50 caracteres."
+                "messages": {
+                    "category-name": {
+                        "required": "El campo nombre es obligatorio.",
+                        "maxlength": "El nombre de la categoría no debe tener mas de 50 caracteres."
                     }
                 }
             };
 
-            validate.form("category-add-form",validateObj);
+            validate.form("category-add-form", validateObj);
         };
 
         /*
@@ -807,10 +807,10 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
          */
-        var treeSelect = function(){
+        var treeSelect = function () {
             treeElement.bind(
                 'tree.select',
-                function(event) {
+                function (event) {
 
                     var adminCategory = $("#admin-category");
 
@@ -824,19 +824,19 @@ $(document).ready(function() {
                         $("#delete-category-id").val(event['node']['id']);
                         $("#delete-category-name").text(event['node']['name']);
 
-                        if(event['node']['children'].length > 0){
+                        if (event['node']['children'].length > 0) {
                             $("#delete-category-branch").parents(".form-group").show();
-                        }else{
+                        } else {
                             $("#delete-category-branch").parents(".form-group").hide();
                         }
 
                         // Habilita los botones.
-                        adminCategory.find("button").each(function(k,element){
+                        adminCategory.find("button").each(function (k, element) {
                             $(element).removeClass("disabled");
                         });
-                    }else {
+                    } else {
                         // inhabilita los botones.
-                        adminCategory.find("button").each(function(k,element){
+                        adminCategory.find("button").each(function (k, element) {
                             $(element).addClass("disabled");
                         });
                     }
@@ -854,20 +854,20 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> categories.main()
         */
-        var getTree = function(){
+        var getTree = function () {
 
             var request_parameters = {
-                "requestType":"custom",
-                "type":"post",
-                "url":"/get-tree",
-                "data":{},
-                "callbacks":{
-                    "beforeSend":function(){},
-                    "success":function(response){
+                "requestType": "custom",
+                "type": "post",
+                "url": "/get-tree",
+                "data": {},
+                "callbacks": {
+                    "beforeSend": function () { },
+                    "success": function (response) {
 
                         initEstate = response.length;
 
-                        if(response.length > 0){
+                        if (response.length > 0) {
 
                             var jqTreeData = sourceDataAsJqTreeData(response);
 
@@ -882,15 +882,15 @@ $(document).ready(function() {
                             $('#no-tree').hide();
                             $('#tree').show();
                             $('#log').show();
-                        }else{
+                        } else {
                             $('#tree').hide();
                             $('#log').hide();
                             $('#no-tree').show();
                         }
 
                     },
-                    "error":function(){},
-                    "complete":function(){}
+                    "error": function () { },
+                    "complete": function () { }
                 }
             };
 
@@ -906,7 +906,7 @@ $(document).ready(function() {
          @returns           -> null
          @implemented by    -> CLIENT
          */
-        categories.main = function(){
+        categories.main = function () {
 
             treeElement = $('#display-tree');
             getTree();
@@ -920,7 +920,7 @@ $(document).ready(function() {
 
         };
 
-    }( window.categories = window.categories || {}, jQuery ));
+    }(window.categories = window.categories || {}, jQuery));
 
     categories.main();
 

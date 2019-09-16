@@ -31,7 +31,7 @@
  @Type              -> NameSpace
  @Descripción       -> NameSpace for ajax requests methods
 */
-(function( ajax, $, undefined ) {
+(function (ajax, $, undefined) {
 
     /*
      @Name              -> getFormData
@@ -42,7 +42,7 @@
      @returns           -> Object
      @implemented by    -> ajax.request()
      */
-    var getFormData = function(parameters){
+    var getFormData = function (parameters) {
         /*
          obj = {};
 
@@ -56,8 +56,8 @@
          */
 
         var data = {};
-        $.each(parameters['form']['inputs'],function(index,input){
-            data[input['name']] = $('#'+input['id']).val();
+        $.each(parameters['form']['inputs'], function (index, input) {
+            data[input['name']] = $('#' + input['id']).val();
         });
         return data;
     };
@@ -70,7 +70,7 @@
      @parameters        -> parameters: JSON object with several directives.
      @returns           -> null
      */
-    var request = function(parameters){
+    var request = function (parameters) {
         var ajax_request_parameters = {
             "type": parameters['type'],
             "url": parameters['url'],
@@ -78,16 +78,16 @@
             "dataType": 'json',
             "data": JSON.stringify(parameters['data']),
             "global": false,
-            "beforeSend":function(){
+            "beforeSend": function () {
                 parameters['callbacks']['beforeSend']();
             },
-            "success":function(response){
+            "success": function (response) {
                 parameters['callbacks']['success'](response);
             },
-            "error":function(response){
+            "error": function (response) {
                 parameters['callbacks']['error'](response);
             },
-            "complete":function(response){
+            "complete": function (response) {
                 parameters['callbacks']['complete'](response);
             }
         };
@@ -101,73 +101,73 @@
      @Type              -> Method
      @Descripción       -> notifies the status of ajax request.
      */
-    ajax.notification = function(event,notification,options){
+    ajax.notification = function (event, notification, options) {
 
         var defaultOptions = {
-            'init' : {
-                'title':    'Processing',
-                'text' :    'Wait a moment while we process your request.',
-                'type':     'info',
-                'icon':     'fa fa-spinner fa-spin',
-                'hide':     false,
-                'closer':   false,
-                'sticker':  false,
-                'opacity':  .75,
-                'shadow':   false,
-                'history':  false
+            'init': {
+                'title': 'Processing',
+                'text': 'Wait a moment while we process your request.',
+                'type': 'info',
+                'icon': 'fa fa-spinner fa-spin',
+                'hide': false,
+                'closer': false,
+                'sticker': false,
+                'opacity': .75,
+                'shadow': false,
+                'history': false
             },
-            'success' : {
-                'title':    'Ready!',
-                'text' :    'Your request has been processed successfully.',
-                'type':     'success',
-                'hide':     true,
-                'closer':   true,
-                'sticker':  true,
-                'icon':     'glyphicon glyphicon-ok-sign',
-                'opacity':  1,
-                'shadow':   true,
-                'history':  true
+            'success': {
+                'title': 'Ready!',
+                'text': 'Your request has been processed successfully.',
+                'type': 'success',
+                'hide': true,
+                'closer': true,
+                'sticker': true,
+                'icon': 'glyphicon glyphicon-ok-sign',
+                'opacity': 1,
+                'shadow': true,
+                'history': true
             },
             'error': {
-                'title':    'Error!',
-                'text' :    'An error has occurred while processing your request.',
-                'type' :    'error',
-                'icon':     'glyphicon glyphicon-warning-sign',
-                'hide':     true,
-                'closer':   true,
-                'sticker':  true,
-                'opacity':  1,
-                'shadow':   true,
-                'history':  true
+                'title': 'Error!',
+                'text': 'An error has occurred while processing your request.',
+                'type': 'error',
+                'icon': 'glyphicon glyphicon-warning-sign',
+                'hide': true,
+                'closer': true,
+                'sticker': true,
+                'opacity': 1,
+                'shadow': true,
+                'history': true
             }
         };
 
         // beforeSend, success, error, complete
 
-        if(event == "beforeSend"){
+        if (event == "beforeSend") {
             var notice;
-            if ( options !== undefined ) {
+            if (options !== undefined) {
                 notice = new PNotify(options);
-            }else{
+            } else {
                 notice = new PNotify(defaultOptions['init']);
             }
         }
 
-        if(event == "success"){
-            if ( options !== undefined ) {
+        if (event == "success") {
+            if (options !== undefined) {
                 notification.update(options);
-            }else{
+            } else {
                 notification.update(defaultOptions['success']);
             }
         }
-        if(event == "error"){
-            if ( options !== undefined ) {
+        if (event == "error") {
+            if (options !== undefined) {
                 notification.update(options);
-            }else{
+            } else {
                 notification.update(defaultOptions['error']);
             }
         }
-        if(event == "complete"){
+        if (event == "complete") {
             notification.remove();
         }
 
@@ -182,28 +182,28 @@
      @parameters        -> parameters: JSON object; .requestType is one string, can be 'form' or 'custom', form means is need one more step before make ajax request, which is get values of form inputs; custom means it ready to make ajax request.
      @returns           -> null
      */
-    ajax.request = function(parameters){
-        if(parameters !== undefined){
-            if(parameters['requestType'] == 'form'){
+    ajax.request = function (parameters) {
+        if (parameters !== undefined) {
+            if (parameters['requestType'] == 'form') {
                 parameters['data'] = getFormData(parameters);
                 request(parameters);
             }
-            if(parameters['requestType'] == "custom"){
+            if (parameters['requestType'] == "custom") {
                 request(parameters);
             }
         }
     };
 
-}( window.ajax = window.ajax || {}, jQuery ));
+}(window.ajax = window.ajax || {}, jQuery));
 
 /*
  @Name              -> validate
  @Type              -> NameSpace
  @Descripción       -> NameSpace for form validation methods, more info about this check this web site: http://jqueryvalidation.org/
  */
-(function( validate, $) {
+(function (validate, $) {
 
-    $.validator.addMethod("noSpecialChars", function(value, element) {
+    $.validator.addMethod("noSpecialChars", function (value, element) {
         return this.optional(element) || /^[a-z0-9\x20]+$/i.test(value);
     }, "Username must contain only letters, numbers, or underscore.");
 
@@ -213,7 +213,7 @@
      @Type              -> Property
      @Descripción       -> validation States class in bootstrap
      */
-    var validationStates = ['has-success','has-warning','has-error'];
+    var validationStates = ['has-success', 'has-warning', 'has-error'];
 
     /*
      @Name              -> inlineForm
@@ -223,31 +223,31 @@
      @parameters        -> formId: string, id of form; options: json object, several directives.
      @returns           -> null
      */
-    validate.inlineForm = function(formId,options){
+    validate.inlineForm = function (formId, options) {
 
-        options.errorPlacement = function(error, element){};
+        options.errorPlacement = function (error, element) { };
 
-        options.success = function(label){};
+        options.success = function (label) { };
 
-        options.highlight = function(element){
-            $(validationStates).each(function(k2,state){
-                if($(element).parents('.form-group').hasClass(state)){
+        options.highlight = function (element) {
+            $(validationStates).each(function (k2, state) {
+                if ($(element).parents('.form-group').hasClass(state)) {
                     $(element).parents('.form-group').removeClass(state);
                 }
             });
             $(element).parents('.form-group').addClass('has-warning');
         };
 
-        options.unhighlight = function(element){
-            $(validationStates).each(function(k2,state){
-                if($(element).parents('.form-group').hasClass(state)){
+        options.unhighlight = function (element) {
+            $(validationStates).each(function (k2, state) {
+                if ($(element).parents('.form-group').hasClass(state)) {
                     $(element).parents('.form-group').removeClass(state);
                 }
             });
             $(element).parents('.form-group').addClass('has-success');
         };
 
-        $("#"+formId).validate(options);
+        $("#" + formId).validate(options);
 
     };
 
@@ -259,34 +259,34 @@
      @parameters        -> formId: string, id of form; options: json object, several directives.
      @returns           -> null
      */
-    validate.form = function(formId,options){
+    validate.form = function (formId, options) {
 
-        options.errorPlacement = function(error, element){
+        options.errorPlacement = function (error, element) {
             $(element).parents('.form-group').find(".help-block").fadeIn().html($(error).html());
         };
 
-        options.success = function(label){
+        options.success = function (label) {
         };
 
-        options.highlight = function(element){
-            $(validationStates).each(function(k2,state){
-                if($(element).parents('.form-group').hasClass(state)){
+        options.highlight = function (element) {
+            $(validationStates).each(function (k2, state) {
+                if ($(element).parents('.form-group').hasClass(state)) {
                     $(element).parents('.form-group').removeClass(state);
                 }
             });
             $(element).parents('.form-group').addClass('has-warning');
         };
 
-        options.unhighlight = function(element){
-            $(validationStates).each(function(k2,state){
-                if($(element).parents('.form-group').hasClass(state)){
+        options.unhighlight = function (element) {
+            $(validationStates).each(function (k2, state) {
+                if ($(element).parents('.form-group').hasClass(state)) {
                     $(element).parents('.form-group').removeClass(state);
                 }
             });
             $(element).parents('.form-group').addClass('has-success');
         };
 
-        $("#"+formId).validate(options);
+        $("#" + formId).validate(options);
 
     };
 
@@ -298,22 +298,22 @@
      @parameters        -> formId: string, id of form.
      @returns           -> null
      */
-    validate.removeValidationStates = function(formId){
-        var form = $('#'+formId);
+    validate.removeValidationStates = function (formId) {
+        var form = $('#' + formId);
 
         form[0].reset();
 
-        $(':input',form)
+        $(':input', form)
             .not(':button, :submit, :reset, :hidden')
             .val('')
             .removeAttr('checked')
             .removeAttr('selected');
 
         var inputs = form.find('input');
-        inputs.each(function(inputKey,_input_){
+        inputs.each(function (inputKey, _input_) {
             var input = $(_input_);
-            $(validationStates).each(function(stateKey,state){
-                if(input.parents('.form-group').hasClass(state)){
+            $(validationStates).each(function (stateKey, state) {
+                if (input.parents('.form-group').hasClass(state)) {
                     input.parents('.form-group').removeClass(state);
                     input.parents('.form-group').find(".help-block").fadeOut();
                 }
@@ -323,31 +323,31 @@
 
 
 
-}( window.validate = window.validate || {}, jQuery ));
+}(window.validate = window.validate || {}, jQuery));
 
 /*
  @Name              -> utility
  @Type              -> NameSpace
  @Descripción       -> NameSpace for utilities methods
  */
-(function( utility){
+(function (utility) {
 
-    utility.randomNumber = function(inferior,superior){
+    utility.randomNumber = function (inferior, superior) {
         var numPosibilidades = superior - inferior;
         var aleatory = Math.random() * numPosibilidades;
         aleatory = Math.round(aleatory);
         return parseInt(inferior) + aleatory;
     };
 
-    utility.capitaliseFirstLetter = function(string){ return string.charAt(0).toUpperCase() + string.slice(1); };
+    utility.capitaliseFirstLetter = function (string) { return string.charAt(0).toUpperCase() + string.slice(1); };
 
-    utility.stringReplace = function(string, change_this, for_this) {
+    utility.stringReplace = function (string, change_this, for_this) {
         return string.split(change_this).join(for_this);
     };
 
-    utility.removeCommentTag = function(data){
-        var face_1 = utility.stringReplace(data,'<!--','');
-        return utility.stringReplace(face_1,'-->','');
+    utility.removeCommentTag = function (data) {
+        var face_1 = utility.stringReplace(data, '<!--', '');
+        return utility.stringReplace(face_1, '-->', '');
     };
 
-}( window.utility = window.utility || {}, jQuery ));
+}(window.utility = window.utility || {}, jQuery));

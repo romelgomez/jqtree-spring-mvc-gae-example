@@ -1,5 +1,8 @@
 target
 
+# vscode 
+.vscode
+
 # IntelliJ IDEA
 .idea
 jqtree-spring-mvc-gae-example.iml
